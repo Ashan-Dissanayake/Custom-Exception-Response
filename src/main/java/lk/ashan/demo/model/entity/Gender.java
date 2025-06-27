@@ -1,4 +1,4 @@
-package lk.ashan.demo.entity;
+package lk.ashan.demo.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

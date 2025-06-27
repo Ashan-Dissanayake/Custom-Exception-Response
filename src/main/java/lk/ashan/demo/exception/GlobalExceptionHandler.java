@@ -1,25 +1,61 @@
 package lk.ashan.demo.exception;
 
-import lk.ashan.demo.exception.customexception.ResourceExistsException;
-import lk.ashan.demo.exception.customexception.ResourceNotFoundException;
-import lk.ashan.demo.exception.entity.Response;
-import org.springframework.http.HttpStatus;
+import jakarta.servlet.http.HttpServletRequest;
+import lk.ashan.demo.model.response.APIErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-@ControllerAdvice()
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = ResourceExistsException.class)
-    public ResponseEntity<Response> handleExistsException (ResourceExistsException e){
-        return  new ResponseEntity<>(new Response( HttpStatus.CONFLICT.value(), e.getMessage()),HttpStatus.CONFLICT);
+    @ExceptionHandler(ResourceExistsException.class)
+    public ResponseEntity<APIErrorResponse> handleExistsException(ResourceExistsException e, HttpServletRequest request) {
+
+        ErrorCode code = ErrorCode.EMPLOYEE_ALREADY_EXISTS;
+
+        APIErrorResponse error = new APIErrorResponse(
+                "https://localhost/" + code.getTypeUri(),
+                code.getTitle(),
+                code.getStatus(),
+                code,
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(error, code.getStatus());
     }
 
-    @ExceptionHandler(value = ResourceNotFoundException.class)
-    public ResponseEntity<Response> handleNotFountException (ResourceNotFoundException e){
-        return  new ResponseEntity<>(new Response( HttpStatus.UNPROCESSABLE_ENTITY.value(), e.getMessage()),HttpStatus.UNPROCESSABLE_ENTITY);
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<APIErrorResponse> handleNotFoundException(ResourceNotFoundException e, HttpServletRequest request) {
+        ErrorCode code = ErrorCode.EMPLOYEE_NOT_FOUND;
+
+        APIErrorResponse error = new APIErrorResponse(
+                "https://localhost" + code.getTypeUri(),
+                code.getTitle(),
+                code.getStatus(),
+                code,
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(error, code.getStatus());
     }
 
+    // Add generic fallback for unexpected errors
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<APIErrorResponse> handleGenericException(Exception e, HttpServletRequest request) {
+        ErrorCode code = ErrorCode.EMPLOYEE_UNKNOWN_ERROR;
 
+        APIErrorResponse error = new APIErrorResponse(
+                "https://localhost" + code.getTypeUri(),
+                code.getTitle(),
+                code.getStatus(),
+                code,
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(error, code.getStatus());
+    }
 }

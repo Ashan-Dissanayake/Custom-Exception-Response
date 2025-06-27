@@ -1,7 +1,6 @@
-package lk.ashan.demo.entity;
+package lk.ashan.demo.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.util.Objects;
 

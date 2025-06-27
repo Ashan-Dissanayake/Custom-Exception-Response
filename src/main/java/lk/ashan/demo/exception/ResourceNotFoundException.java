@@ -1,4 +1,4 @@
-package lk.ashan.demo.exception.customexception;
+package lk.ashan.demo.exception;
 
 public class ResourceNotFoundException extends RuntimeException{
 
