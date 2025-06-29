@@ -19,7 +19,7 @@ public enum ErrorCode {
     // Technical-Level Error Codes (5xx)
     EMPLOYEE_SERVICE_UNAVAILABLE("Employee service unavailable", HttpStatus.SERVICE_UNAVAILABLE, "/errors/employee-service-unavailable"),
     EMPLOYEE_DATA_CONFLICT("Employee data conflict", HttpStatus.INTERNAL_SERVER_ERROR, "/errors/employee-data-conflict"),
-    EMPLOYEE_UNKNOWN_ERROR("Unknown error occurred", HttpStatus.INTERNAL_SERVER_ERROR, "/errors/employee-unknown-error");
+    UNKNOWN_ERROR("Unknown error occurred", HttpStatus.INTERNAL_SERVER_ERROR, "/errors/employee-unknown-error");
 
     private final String title;
     private final HttpStatus status;
