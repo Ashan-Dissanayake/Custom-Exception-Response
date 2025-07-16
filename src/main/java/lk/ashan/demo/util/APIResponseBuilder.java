@@ -1,38 +1,82 @@
 package lk.ashan.demo.util;
 
-import lk.ashan.demo.exception.ErrorCode;
+import jakarta.servlet.http.HttpServletRequest;
 import lk.ashan.demo.model.response.APIErrorResponse;
 import lk.ashan.demo.model.response.APISuccessResponse;
+import lk.ashan.demo.model.response.ErrorCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Map;
 
 public class APIResponseBuilder {
 
-    // Success Response
-    public static <T> ResponseEntity<APISuccessResponse<T>> success(
-            T data,
-            Map<String, Object> meta,
-            Map<String, String> links
-    ) {
-        return ResponseEntity.ok(new APISuccessResponse<>(data, meta, links));
+    public static <T> ResponseEntity<APISuccessResponse<T>> getResponse(T data, int count) {
+        return ResponseEntity.ok(new APISuccessResponse<>(
+                data,
+                Map.of("count", count),
+                Map.of("self", buildCurrentRequestUrl())
+        ));
     }
 
-    // Error Response
+    public static <T> ResponseEntity<APISuccessResponse<T>> postResponse(T data, Object id) {
+        return new ResponseEntity<>(new APISuccessResponse<>(
+                data,
+                Map.of("status", "created"),
+                Map.of("self", buildUrlWithPath("/" + id))
+        ), HttpStatus.CREATED);
+    }
+
+    public static <T> ResponseEntity<APISuccessResponse<T>> putResponse(T data, Object id) {
+        return new ResponseEntity<>(new APISuccessResponse<>(
+                data,
+                Map.of("status", "updated"),
+                Map.of("self", buildUrlWithPath("/"+id))
+        ), HttpStatus.OK);
+    }
+
+    public static <T> ResponseEntity<APISuccessResponse<T>> deleteResponse(Object id) {
+        return new ResponseEntity<>(new APISuccessResponse<>(
+                null,
+                Map.of("status", "deleted"),
+                Map.of("self", buildUrlWithPath("/"+id))
+        ), HttpStatus.NO_CONTENT);
+    }
+
     public static ResponseEntity<APIErrorResponse> error(
             ErrorCode errorCode,
             String detail,
-            String instance
+            HttpServletRequest request
     ) {
-        APIErrorResponse errorResponse = new APIErrorResponse(
+        String instanceUri = buildInstanceUrl(request);
+        return new ResponseEntity<>(new APIErrorResponse(
                 "https://localhost" + errorCode.getTypeUri(),
                 errorCode.getTitle(),
                 errorCode.getStatus(),
                 errorCode,
                 detail,
-                instance
-        );
+                instanceUri
+        ), errorCode.getStatus());
+    }
 
-        return new ResponseEntity<>(errorResponse, errorCode.getStatus());
+    private static String buildCurrentRequestUrl() {
+        return ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .toUriString();
+    }
+
+    private static String buildUrlWithPath(String pathSegment) {
+        return ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .path(pathSegment)
+                .toUriString();
+    }
+
+    private static String buildInstanceUrl(HttpServletRequest request) {
+        return ServletUriComponentsBuilder
+                .fromRequestUri(request)
+                .toUriString();
     }
 }
+

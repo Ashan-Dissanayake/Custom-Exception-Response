@@ -2,6 +2,7 @@ package lk.ashan.demo.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lk.ashan.demo.model.response.APIErrorResponse;
+import lk.ashan.demo.model.response.ErrorCode;
 import lk.ashan.demo.util.APIResponseBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,12 +17,11 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return APIResponseBuilder.error(
-                ErrorCode.EMPLOYEE_ALREADY_EXISTS,
+                ErrorCode.RESOURCE_ALREADY_EXISTS,
                 e.getMessage(),
-                request.getRequestURI()
+                request
         );
     }
-
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<APIErrorResponse> handleNotFoundException(
@@ -29,9 +29,9 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return APIResponseBuilder.error(
-                ErrorCode.EMPLOYEE_NOT_FOUND,
+                ErrorCode.RESOURCE_NOT_FOUND,
                 e.getMessage(),
-                request.getRequestURI()
+                request
         );
     }
 
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         return APIResponseBuilder.error(
                 ErrorCode.UNKNOWN_ERROR,
                 e.getMessage(),
-                request.getRequestURI()
+                request
         );
     }
 }
